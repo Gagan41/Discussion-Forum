@@ -1,12 +1,12 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { toggle } from "../features/themeSlice"; // Correctly importing toggle action
+import { toggle } from "../context/themeSlice";
 
 const Light = () => {
   const dispatch = useDispatch();
   return (
     <svg
-      onClick={() => dispatch(toggle())} // Dispatching toggle action
+      onClick={() => dispatch(toggle())}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

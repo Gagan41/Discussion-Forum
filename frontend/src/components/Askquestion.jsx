@@ -1,14 +1,13 @@
 import React from "react";
-import Add from "../icons/Add";
 import Share from "../icons/Share";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import moment from "moment"; // Correct import
+import { duration } from "moment";
 
 const Askquestion = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const navigate = useNavigate(); // Fixed typo here (naviate -> navigate)
+  const naviate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,31 +21,16 @@ const Askquestion = () => {
 
     const response = await query({ inputs: title.value });
     console.log("response", response);
-    
-    const label_0 = response[0][0].label;
-
-    // Check for spam detection
-    if (label_0 === "LABEL_0") {
-      toast.error("Your question seems to be a spam", {
-        duration: 2000 // Correct usage of duration
-      });
-      return;
-    }
-
-    // Make sure to create a duration only if necessary
-    const myDuration = moment.duration(5, 'days'); // You can use this duration as needed
+   
 
     const res = await axios.post(
       `${process.env.REACT_APP_BACKEND_URL}/ask-question`,
       question
     );
-    
     if (res.status === 201) {
-      toast.success("Question added successfully", {
-        duration: 2000 // Correct usage of duration
-      });
+      toast.success("Question added successfully", (duration = 2000));
       setTimeout(() => {
-        navigate("/"); // Fixed typo here (naviate -> navigate)
+        naviate("/");
       }, 2000);
     }
   };
@@ -69,18 +53,28 @@ const Askquestion = () => {
   return (
     <div className="h-full md:w-[50%]">
       <Toaster />
-      <div className="md:mx-12 flex flex-col items-center gap-4 mb-12 border p-4 pb-6 rounded-md bg-purple-300 dark:bg-[#1E212A] mt-12">
-        <h1 className="text-2xl font-bold text-center text-purple-600">
+      <div
+        className="md:mx-12 flex flex-col items-center 
+      gap-4 mb-12 border p-4 pb-6 rounded-md bg-purple-300 
+      dark:bg-[#1E212A]  mt-12"
+      >
+        <h1
+          className="text-2xl font-bold text-center
+        text-purple-600 
+        "
+        >
           Ask a Question
         </h1>
-        <form onSubmit={handleSubmit} className="form w-full">
+
+        <form onSubmit={handleSubmit} className="form w-full ">
           <div className="title">
             <label className="text-gray-800 text-start dark:text-white">
               Question Title
             </label>
             <input
               name="title"
-              className="mt-2 w-full h-10 px-3 rounded outline-none border-none shadow-sm"
+              className="mt-2 w-full h-10 px-3 rounded outline-none border-none
+                shadow-sm"
               type="text"
             />
           </div>
@@ -90,7 +84,7 @@ const Askquestion = () => {
             </label>
             <textarea
               name="description"
-              className="mt-2 w-full h-24 px-3 py-2 rounded outline-none border-none shadow-sm"
+              className="mt-2 w-full h-24 px-3 py-2 rounded outline-none border-none  shadow-sm"
               type="text"
             />
           </div>
@@ -100,8 +94,8 @@ const Askquestion = () => {
             </label>
             <input
               name="tags"
-              placeholder="Enter tags separated by comma"
-              className="mt-2 w-full h-10 px-3 rounded outline-none border-none shadow-sm"
+              placeholder="Enter tags seperated by comma"
+              className="mt-2 w-full h-10 px-3 rounded outline-none border-none  shadow-sm"
               type="text"
             />
           </div>

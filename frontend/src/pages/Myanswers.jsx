@@ -1,13 +1,11 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import newRequests from "../utils/newRequest";
 import Arrowup from "../icons/Arrowup";
 import Arrowdown from "../icons/Arrowdown";
 import UserInfo from "../components/UserInfo";
-import Write from "../icons/Write";
 import SyncLoader from "react-spinners/SyncLoader";
 import NothingHere from "../components/NothingHere";
-import config from "../config";
 
 const Myanswers = () => {
   const [openId, setOpenId] = React.useState([]);
@@ -15,14 +13,14 @@ const Myanswers = () => {
 
   const { isLoading, data } = useQuery("getMyQuestions", () =>
     newRequests
-      .get(`${config.BACKEND_URL}/my-questions/${id}`)
+      .get(`${process.env.REACT_APP_BACKEND_URL}/my-questions/${id}`)
       .then((res) => res.data)
   );
 
   if (isLoading)
     return (
       <div className="h-screen mt-[10%] w-[100%] text-center">
-        <SyncLoader color="#36D7B7" loading={true} />
+        <SyncLoader size={10} color="#7E22CE" />
       </div>
     );
 

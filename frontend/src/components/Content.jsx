@@ -1,14 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Arrowup from "../icons/Arrowup";
 import Arrowdown from "../icons/Arrowdown";
-import Comment from "../icons/Comment";
 import UserInfo from "./UserInfo";
 import Write from "../icons/Write";
 import Send from "../icons/Send";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "react-query";
 import newRequests from "../utils/newRequest";
 import { useParams } from "react-router-dom";
-import SyncLoader from "react-spinners/SyncLoader";
 import { Toaster } from "react-hot-toast";
 import Loading from "./Loading";
 import NothingHere from "./NothingHere";
@@ -18,19 +16,16 @@ const Content = () => {
   const [openId, setOpenId] = React.useState([]);
   const [answer, setAnswer] = React.useState("");
 
-  const { isLoading, data } = useQuery({
-    queryKey: ["getAllQuestions", topic], // Updated to use an array for the query key
-    queryFn: () => {
-      if (topic) {
-        return newRequests
-          .get(`${config.BACKEND_URL}/find/${topic}`)
-          .then((res) => res.data);
-      } else {
-        return newRequests
-          .get(`${config.BACKEND_URL}/questions`)
-          .then((res) => res.data);
-      }
-    },
+  const { isLoading, data } = useQuery("getAllQuestions", () => {
+    if (topic) {
+      return newRequests
+        .get(`${process.env.REACT_APP_BACKEND_URL}/find/${topic}`)
+        .then((res) => res.data);
+    } else {
+      return newRequests
+        .get(`${process.env.REACT_APP_BACKEND_URL}/questions`)
+        .then((res) => res.data);
+    }
   });
 
   if (isLoading) return <Loading />;
@@ -41,7 +36,7 @@ const Content = () => {
     md:gap-8 my-8 "
     >
       <Toaster />
-      {data?.length > 0 && // Added optional chaining to handle undefined 'data'
+      {data.length > 0 &&
         data.map((question, index) => {
           return (
             <div
@@ -58,7 +53,7 @@ const Content = () => {
                 <div className="left-section space-y-1 text-center">
                   <Arrowup id={question._id} />
                   <h3 className="text-sm md:text-base">
-                    {question?.upvote?.length || 0} {/* Added fallback value */}
+                    {question?.upvote?.length || 0}
                   </h3>
                   <Arrowdown id={question._id} />
                 </div>
@@ -78,7 +73,7 @@ const Content = () => {
                   />
                 </div>
               </div>
-              {/* nested comment */}
+              {/* nested comment       */}
               {openId.find((ele) => ele === index + 1) && (
                 <>
                   {question?.replies?.map((answer, index) => {
@@ -101,7 +96,7 @@ const Content = () => {
                       </div>
                     );
                   })}
-                  {/* nested comment */}
+                  {/* nested comment       */}
                   <div
                     className="w-full bg-white dark:bg-slate-900 flex items-center gap-4
        px-5 py-2 rounded-lg shadow-md  mt-2"
@@ -126,7 +121,7 @@ const Content = () => {
             </div>
           );
         })}
-      {data?.length === 0 && <NothingHere />} 
+      {data.length === 0 && <NothingHere />}
     </div>
   );
 };

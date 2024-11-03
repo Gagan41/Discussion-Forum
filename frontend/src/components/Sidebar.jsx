@@ -1,29 +1,30 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toggle } from "../context/sidebarSlice";
 
-const Sidebar = ({ open, toggleSidebar }) => {
+const Sidebar = () => {
   const navigate = useNavigate();
   const location = window.location.pathname;
+  const open = useSelector((state) => state.sidebar.open);
   const dispatch = useDispatch();
   const active =
-    "bg-purple-100 text-purple-500 px-4 py-2 rounded-sm border-l-4 border-purple-700";
-
+    "  bg-purple-100 text-purple-500 px-4 py-2 rounded-sm border-l-4 border-purple-700";
   return (
     <div
       className={`${
         open ? "block" : "hidden"
-      } md:block w-[60%] md:w-[15%] h-full md:h-80 fixed left-0 md:left-28 z-10 top-14 md:top-24 list-none
-      text-gray-300 text-sm space-y-4 py-8 md:py-0 bg-white dark:bg-[#1E212A] md:dark:bg-inherit shadow-md 
-      md:shadow-none md:bg-transparent`}
+      } md:block  w-[60%] md:w-[15%] h-full md:h-80 fixed left-0 md:left-28 z-10 top-14 md:top-24 list-none
+    text-gray-300 text-sm space-y-4 py-8 md:py-0
+     bg-white dark:bg-[#1E212A] md:dark:bg-inherit shadow-md 
+     md:shadow-none md:bg-transparent
+    `}
     >
-      <button onClick={toggleSidebar}>Toggle Sidebar</button>
-
       <li
         onClick={() => navigate("/")}
         className={
           "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 hover:cursor-pointer " +
-          (location === "/" ? active : "")
+          (location === "/" ? active : " ")
         }
       >
         <svg
@@ -42,7 +43,6 @@ const Sidebar = ({ open, toggleSidebar }) => {
         </svg>
         HOME
       </li>
-
       <li
         onClick={() => navigate("/explore")}
         className={
@@ -66,9 +66,10 @@ const Sidebar = ({ open, toggleSidebar }) => {
         </svg>
         EXPLORE TOPICS
       </li>
-
       <li
-        onClick={() => navigate("/chat")}
+        onClick={() => {
+          navigate("/chat");
+        }}
         className={
           "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer " +
           (location === "/chat" ? active : "")
@@ -95,7 +96,6 @@ const Sidebar = ({ open, toggleSidebar }) => {
         </svg>
         CHAT
       </li>
-
       <li
         onClick={() => navigate("/myqna")}
         className={
@@ -126,7 +126,8 @@ const Sidebar = ({ open, toggleSidebar }) => {
           dispatch(toggle());
         }}
         className="md:hidden flex items-center justify-center gap-2 px-4 py-2 cursor-pointer 
-          bg-purple-600 mx-4 rounded-md text-white"
+          bg-purple-600 mx-4 rounded-md text-white
+          "
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

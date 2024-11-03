@@ -3,14 +3,13 @@ import React from "react";
 import upload from "../utils/upload";
 import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import config from "../config";
 
 const Register = () => {
   const [profileImage, setProfileImage] = React.useState(
     "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg"
   );
   const navigate = useNavigate();
-  const [status, setStatus] = React.useState(null);
+  const [status] = React.useState(null);
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -32,7 +31,7 @@ const Register = () => {
 
     try {
       const res = await axios.post(
-        `${config.BACKEND_URL}/api/signup`,
+        `${process.env.REACT_APP_BACKEND_URL}/signup`,
         user
       );
       if (res.status === 201) {
@@ -114,7 +113,6 @@ const Register = () => {
                 onChange={(e) => setName(e.target.value)}
                 type="text"
                 name="name"
-                autoComplete="name"
                 className="border border-purple-200 mt-2 w-full h-10 px-3 rounded 
                 outline-none 
                    shadow-sm"
@@ -131,7 +129,6 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 name="email"
-                autoComplete="email"
                 className="border border-purple-200 mt-2 w-full h-10 px-3 rounded 
                 outline-none 
                    shadow-sm"
