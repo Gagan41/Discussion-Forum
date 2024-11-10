@@ -47,10 +47,13 @@ const Chat = () => {
     }
 
     socket.on("user-joined", (newUser) => {
+      if (newUser._id !== user._id) { // Ensure no duplicate or self-switch
+        dispatch(addUsers(newUser));
+      }
       console.log("User joined:", newUser);
       dispatch(addUsers(newUser));
     });
-
+    
     socket.on("user-left", (userId) => {
       console.log("User left:", userId);
       dispatch(removeUsers({ _id: userId }));

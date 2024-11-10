@@ -19,7 +19,7 @@ const Askquestion = () => {
       userId: user._id,
     };
 
-    const response = await query({ inputs: title.value });
+    const response = await callHuggingFaceModel();
     console.log("response", response);
    
 
@@ -35,20 +35,59 @@ const Askquestion = () => {
     }
   };
 
-  async function query(data) {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/shahrukhx01/bert-mini-finetune-question-detection",
-      {
-        headers: {
-          Authorization: "Bearer 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",
-        },
-        method: "POST",
-        body: JSON.stringify(data),
+  async function callHuggingFaceModel() {
+    const modelUrl = "https://api-inference.huggingface.co/models/shahrukhx01/bert-mini-finetune-question-detection";
+    
+    const fetchModelResponse = async () => {
+      try {
+        const response = await fetch(modelUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer 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`  // Replace with your actual Hugging Face API key
+          },
+          body: JSON.stringify({ inputs: "Sample input for the model" })
+        });
+  
+        if (!response.ok) {
+          if (response.status === 503) {
+            throw new Error("Model is loading, retrying...");
+          } else {
+            throw new Error("Failed to call the model.");
+          }
+        }
+  
+        return await response.json();
+      } catch (error) {
+        console.error("Error calling Hugging Face model:", error);
+        throw error;  // Throw error to retry logic
       }
-    );
-    const result = await response.json();
+    };
+  
+    let attempts = 0;
+    const maxRetries = 5;
+    let success = false;
+    let result;
+  
+    while (attempts < maxRetries && !success) {
+      try {
+        result = await fetchModelResponse();
+        success = true; // If no error is thrown, the call was successful
+      } catch (error) {
+        attempts++;
+        if (attempts < maxRetries) {
+          console.log(`Retrying... (${attempts}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 5000)); // wait 5 seconds before retrying
+        } else {
+          console.log("Failed after multiple retries");
+        }
+      }
+    }
+  
     return result;
   }
+  
+  
 
   return (
     <div className="h-full md:w-[50%]">
