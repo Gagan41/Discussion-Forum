@@ -223,18 +223,8 @@ app.get("/find/:topic", async (req, res) => {
   }
 });
 
-const deleteUser = async () => {
-  try {
-    const deleteQuestion = await Question.deleteMany({});
-    const deleteReply = await Reply.deleteMany({});
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
 const server = app.listen(PORT, () => {
   connectDB();
-  deleteUser();
   console.log(`Server running on port ${PORT}`);
 });
 
@@ -247,40 +237,65 @@ const io = new Server(server, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("socket connected");
-  const users = [];
+let connectedUsers = new Map();
+let disconnectTimeouts = new Map();
 
-  for (let [id, socket] of io.of("/").sockets) {
-    if (socket.handshake.auth._id)
-      users.push({
-        ...socket.handshake.auth,
-        socketId: socket.handshake.auth._id,
-      });
+io.on("connection", (socket) => {
+  console.log("socket connected", socket.id);
+
+  const userId = socket.handshake.auth._id;
+  if (userId) {
+    // Clear any pending disconnection timeout for the user
+    if (disconnectTimeouts.has(userId)) {
+      clearTimeout(disconnectTimeouts.get(userId));
+      disconnectTimeouts.delete(userId);
+    }
+
+    // Add or update user in connected users
+    connectedUsers.set(userId, {
+      ...socket.handshake.auth,
+      socketId: socket.id,
+    });
+
+    // Notify all clients of the updated user list
+    io.emit("user-connected", Array.from(connectedUsers.values()));
   }
 
-  console.log("users", users);
-  io.emit("user-connected", users);
-
+  // Handle joining rooms
   socket.on("join-room", ({ room, user }) => {
-    users[user._id] = user;
     socket.join(room);
-
-    socket.broadcast.to(room).emit("user-connected", users);
+    io.to(room).emit("user-connected", Array.from(connectedUsers.values()));
   });
 
+  // Send message in room
   socket.on("send-message", ({ message, room, user }) => {
-    console.log("message", message, room, user);
     io.to(room).emit("receive-message", { message, user, room });
   });
 
+  // Handle user logout explicitly
+  socket.on("logout", () => {
+    if (userId) {
+      connectedUsers.delete(userId);
+      io.emit("user-disconnected", Array.from(connectedUsers.values()));
+    }
+    socket.disconnect();
+  });
+
+  // Handle disconnection with a timeout
   socket.on("disconnect", () => {
-    console.log("disconnected");
-    const delUser = users.filter(
-      (user) => user.socketId !== socket.handshake.auth._id
-    );
-    console.log("disconnected users", delUser);
-    io.emit("user-disconnected", delUser);
+    console.log("socket disconnected", socket.id);
+
+    if (userId) {
+      // Set a timeout before fully removing the user
+      disconnectTimeouts.set(
+        userId,
+        setTimeout(() => {
+          connectedUsers.delete(userId);
+          disconnectTimeouts.delete(userId);
+          io.emit("user-disconnected", Array.from(connectedUsers.values()));
+        }, 3000) // 3-second delay to allow reconnection
+      );
+    }
   });
 });
 
