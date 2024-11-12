@@ -42,7 +42,7 @@ const Content = () => {
             <div
               key={index}
               className="w-[96%] md:w-[80%] mx-12 flex flex-col 
-              items-end  p-3 md:p-4 rounded-md bg-purple-100
+              items-end p-3 md:p-4 rounded-md bg-purple-100
                dark:bg-slate-400"
             >
               <div

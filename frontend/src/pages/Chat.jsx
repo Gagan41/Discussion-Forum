@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios"; // Import axios to make HTTP requests
 import Write from "../icons/Write";
 import moment from "moment";
 import { socket } from "../App"; // Ensure this imports the socket.io-client instance
@@ -12,26 +13,26 @@ const discussionTopics = [
 
 const Chat = () => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(
-    JSON.parse(localStorage.getItem("messages")) || {
-      technology: [],
-      Climate: [],
-      Space: [],
-      health: [],
-      education: [],
-      globalization: [],
-      culture: [],
-      Political: [],
-      Sports: [],
-    }
-  );
-
+  const [messages, setMessages] = useState({});
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [user] = useState(storedUser);
   const [room, setRoom] = useState(localStorage.getItem("room") || "technology");
 
   const onlineUsers = useSelector((state) => state.online.onlineUsers);
   const dispatch = useDispatch();
+
+  // Fetch messages for the selected room
+  const fetchMessages = async (room) => {
+    try {
+      const response = await axios.get(`http://localhost:5132/messages/${room}`);
+      setMessages((prev) => ({
+        ...prev,
+        [room]: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -42,16 +43,19 @@ const Chat = () => {
     const storedRoom = localStorage.getItem("room") || "technology";
     setRoom(storedRoom);
 
+    if (room) {
+      fetchMessages(room); // Fetch messages when room changes
+    }
+
     if (socket.connected) {
-      socket.emit("join-room", { room: storedRoom, user });
+      socket.emit("join-room", { room, user });
     }
 
     socket.on("user-joined", (newUser) => {
-      if (newUser._id !== user._id) { // Ensure no duplicate or self-switch
+      if (newUser._id !== user._id) {
         dispatch(addUsers(newUser));
       }
       console.log("User joined:", newUser);
-      dispatch(addUsers(newUser));
     });
     
     socket.on("user-left", (userId) => {
@@ -59,18 +63,14 @@ const Chat = () => {
       dispatch(removeUsers({ _id: userId }));
     });
 
-    socket.on("receive-message", ({ message, room, user }) => {
-      setMessages((prev) => {
-        const updatedMessages = {
-          ...prev,
-          [room]: [
-            ...(prev[room] || []),
-            { message, user, createdAt: new Date() },
-          ],
-        };
-        localStorage.setItem("messages", JSON.stringify(updatedMessages));
-        return updatedMessages;
-      });
+    socket.on("receive-message", (newMessage) => {
+      setMessages((prev) => ({
+        ...prev,
+        [newMessage.room]: [
+          ...(prev[newMessage.room] || []),
+          { message: newMessage.message, user: newMessage.user, createdAt: newMessage.createdAt },
+        ],
+      }));
     });
 
     socket.on("update-online-users", (users) => {
@@ -78,7 +78,6 @@ const Chat = () => {
     });
 
     return () => {
-      // Clean up socket listeners to prevent duplicate listeners when the component rerenders
       socket.off("user-joined");
       socket.off("user-left");
       socket.off("receive-message");
@@ -97,6 +96,7 @@ const Chat = () => {
     if (room !== newRoom) {
       setRoom(newRoom);
       localStorage.setItem("room", newRoom);
+      fetchMessages(newRoom);
       if (socket.connected) {
         socket.emit("join-room", { room: newRoom, user });
       }
