@@ -9,7 +9,7 @@ const questionSchema = mongoose.Schema(
     description: {
       type: String,
     },
-    author: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "DiscussionUser",
@@ -33,6 +33,7 @@ const questionSchema = mongoose.Schema(
       ref: "DiscussionUser",
       default: [],
     },
+    image: { type: String, default: null },
   },
   {
     timestamps: true,
