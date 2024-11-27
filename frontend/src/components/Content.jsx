@@ -36,19 +36,18 @@ const Content = () => {
     md:gap-8 my-8 "
     >
       <Toaster />
-      {data.length > 0 &&
+      {Array.isArray(data) && data.length > 0 ? (
         data.map((question, index) => {
           return (
             <div
               key={index}
               className="w-[96%] md:w-[80%] mx-12 flex flex-col 
-              items-end p-3 md:p-4 rounded-md bg-purple-100
+              items-end  p-3 md:p-4 rounded-md bg-purple-100
                dark:bg-slate-400"
             >
               <div
                 className="w-full bg-white dark:bg-[#1E212A]
-              
-              p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5"
+               p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5"
               >
                 <div className="left-section space-y-1 text-center">
                   <Arrowup id={question._id} />
@@ -64,6 +63,15 @@ const Content = () => {
                   <p className="text-sm md:text-base">
                     {question?.description}
                   </p>
+                  {question.image && (
+                    <div className="mt-4">
+                      <img
+                        src={`${process.env.REACT_APP_BACKEND_URL}/${question.image}`}
+                        alt="Question Attachment"
+                        className="w-full max-h-60 object-cover rounded-md"
+                      />
+                    </div>
+                  )}
                   <hr />
                   <UserInfo
                     openId={openId}
@@ -73,22 +81,20 @@ const Content = () => {
                   />
                 </div>
               </div>
-              {/* nested comment       */}
+              {/* nested comment */}
               {openId.find((ele) => ele === index + 1) && (
                 <>
                   {question?.replies?.map((answer, index) => {
-                    console.log("answer", answer);
                     return (
                       <div key={answer._id} className="flex items-center gap-4">
-                        {/* fix this */}
                         <img
                           className="h-4 md:h-6 w-4 md:w-6"
                           src="https://cdn.icon-icons.com/icons2/2596/PNG/512/nested_arrows_icon_155086.png"
                           alt=""
                         />
                         <div
-                          className="   bg-white dark:bg-[#32353F] dark:text-white
-          max-w-xl p-5 rounded-lg shadow-md flex flex-col items-start gap-5 mt-2"
+                          className="bg-white dark:bg-[#32353F] dark:text-white
+                          max-w-xl p-5 rounded-lg shadow-md flex flex-col items-start gap-5 mt-2"
                         >
                           <p className="text-inherit">{answer?.reply}</p>
                           <UserInfo answer={answer} />
@@ -96,16 +102,15 @@ const Content = () => {
                       </div>
                     );
                   })}
-                  {/* nested comment       */}
                   <div
                     className="w-full bg-white dark:bg-slate-900 flex items-center gap-4
-       px-5 py-2 rounded-lg shadow-md  mt-2"
+                    px-5 py-2 rounded-lg shadow-md  mt-2"
                   >
                     <Write />
                     <input
                       onChange={(e) => setAnswer(e.target.value)}
                       className="w-full h-10 border-none outline-none 
-          rounded-md py-1 px-2 "
+                      rounded-md py-1 px-2 "
                       type="text"
                       value={answer}
                       placeholder="Write a comment"
@@ -120,8 +125,10 @@ const Content = () => {
               )}
             </div>
           );
-        })}
-      {data.length === 0 && <NothingHere />}
+        })
+      ) : (
+        <NothingHere />
+      )}
     </div>
   );
 };

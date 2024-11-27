@@ -9,14 +9,16 @@ import NothingHere from "../components/NothingHere";
 
 const Myanswers = () => {
   const [openId, setOpenId] = React.useState([]);
-  const id = JSON.parse(localStorage.getItem("user"))._id;
+  const user = JSON.parse(localStorage.getItem("user"));
+  const id = user?._id;
 
-  const { isLoading, data } = useQuery("getMyQuestions", () =>
+  const { isLoading, data, error } = useQuery("getMyQuestions", () =>
     newRequests
       .get(`${process.env.REACT_APP_BACKEND_URL}/my-questions/${id}`)
       .then((res) => res.data)
   );
 
+  // Handle loading state
   if (isLoading)
     return (
       <div className="h-screen mt-[10%] w-[100%] text-center">
@@ -24,13 +26,26 @@ const Myanswers = () => {
       </div>
     );
 
+  // Handle error state
+  if (error) {
+    console.error("Error fetching questions:", error.message);
+    return (
+      <div className="h-screen mt-[10%] w-[100%] text-center text-red-500">
+        <p>Error loading your questions. Please try again later.</p>
+      </div>
+    );
+  }
+
+  // Safeguard for undefined data
+  const questions = Array.isArray(data) ? data : [];
+
   return (
     <div
       className="h-full w-full md:w-[60%] flex flex-col items-center 
     gap-8 "
     >
-      {data.length > 0 &&
-        data.map((question, index) => (
+      {questions.length > 0 &&
+        questions.map((question, index) => (
           <div
             key={index}
             className="w-full my-8 md:w-[80%] md:mx-12 flex flex-col items-end border 
@@ -58,34 +73,29 @@ const Myanswers = () => {
                 />
               </div>
             </div>
-            {/* nested comment       */}
+            {/* nested comment */}
             {openId.find((ele) => ele === index + 1) && (
               <>
-                {question?.replies?.map((answer, index) => {
-                  console.log("answer", answer);
-                  return (
-                    <div key={answer._id} className="flex items-center gap-4">
-                      {/* fix this */}
-                      <img
-                        className="h-4 md:h-6 w-4 md:w-6"
-                        src="https://cdn.icon-icons.com/icons2/2596/PNG/512/nested_arrows_icon_155086.png"
-                        alt=""
-                      />
-                      <div
-                        className="   bg-white
-      max-w-xl  p-5 rounded-lg shadow-md flex flex-col items-start gap-5 mt-2"
-                      >
-                        <p>{answer?.reply}</p>
-                        <UserInfo answer={answer} />
-                      </div>
+                {question?.replies?.map((answer, replyIndex) => (
+                  <div key={answer._id} className="flex items-center gap-4">
+                    <img
+                      className="h-4 md:h-6 w-4 md:w-6"
+                      src="https://cdn.icon-icons.com/icons2/2596/PNG/512/nested_arrows_icon_155086.png"
+                      alt="Nested Arrow"
+                    />
+                    <div
+                      className="bg-white max-w-xl p-5 rounded-lg shadow-md flex flex-col items-start gap-5 mt-2"
+                    >
+                      <p>{answer?.reply}</p>
+                      <UserInfo answer={answer} />
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </>
             )}
           </div>
         ))}
-      {data.length === 0 && <NothingHere />}
+      {questions.length === 0 && <NothingHere />}
     </div>
   );
 };
