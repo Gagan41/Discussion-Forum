@@ -3,7 +3,6 @@ import { BsCamera } from "react-icons/bs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { duration } from "moment";
 
 const AskQuestion = () => {
   const user = JSON.parse(localStorage.getItem("user")); 

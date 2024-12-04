@@ -63,15 +63,16 @@ const Content = () => {
                   <p className="text-sm md:text-base">
                     {question?.description}
                   </p>
-                  {question.image && (
+                  {question.image ? (
                     <div className="mt-4">
                       <img
-                        src={`${process.env.REACT_APP_BACKEND_URL}/${question.image}`}
+                        src={`${process.env.REACT_APP_BACKEND_URL}/questions/${question._id}/image`}
                         alt="Question Attachment"
                         className="w-full max-h-60 object-cover rounded-md"
                       />
                     </div>
-                  )}
+                  ) : null}
+
                   <hr />
                   <UserInfo
                     openId={openId}
