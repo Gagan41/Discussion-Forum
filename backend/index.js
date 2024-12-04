@@ -7,7 +7,6 @@ import cors from "cors";
 import { Server } from "socket.io";
 import bcrypt from 'bcryptjs';
 import multer from "multer";
-import fs from "fs";
 import Message from "./model/message.js";
 
 const app = express();
@@ -69,44 +68,58 @@ app.post('/login', async (req, res) => {
   }
 });
 
-const uploadsDir = "uploads";
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Directory to save images
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Unique file name
-  },
-});
-
+// Multer setup for memory storage
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 app.use(express.json()); // Parse JSON bodies
 
+// Route to ask a question
 app.post("/ask-question", upload.single("image"), async (req, res) => {
   const { question, description, userId, tags } = req.body;
-  const image = req.file ? req.file.path : null;
 
   try {
-    const newQuestion = await Question.create({
+    // Prepare the question object
+    const newQuestion = new Question({
       question,
       description,
       userId,
-      tags: tags ? tags.split(",") : [],
-      image,
+      tags: tags ? JSON.parse(tags) : [],
     });
-    return res.status(201).json(newQuestion);
+
+    // If an image is uploaded, save its data
+    if (req.file) {
+      newQuestion.image = {
+        data: req.file.buffer, // Store binary image data
+        contentType: req.file.mimetype, // MIME type
+      };
+    }
+
+    // Save the question in the database
+    const savedQuestion = await newQuestion.save();
+    return res.status(201).json(savedQuestion);
   } catch (error) {
-    console.error("Error saving question:", error.message, error.stack);
+    console.error("Error saving question:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
-app.use("/uploads", express.static("uploads"));
+// Route to serve images
+app.get("/questions/:id/image", async (req, res) => {
+  try {
+    const question = await Question.findById(req.params.id);
+    if (!question || !question.image) {
+      return res.status(404).send("Image not found");
+    }
+
+    res.contentType(question.image.contentType);
+    res.send(question.image.data);
+  } catch (error) {
+    console.error("Error retrieving image:", error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 app.post("/answer/:id", async (req, res) => {
   const { answer, userId } = req.body;
@@ -225,6 +238,21 @@ app.get("/my-questions/:id", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+app.delete('/questions/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await Question.findByIdAndDelete(id);
+    if (!result) {
+      return res.status(404).send({ error: 'Question not found' });
+    }
+    res.status(200).send({ message: 'Question deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: 'Server error' });
+  }
+});
+
 
 app.get("/find/:topic", async (req, res) => {
   const { topic } = req.params;

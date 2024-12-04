@@ -33,7 +33,10 @@ const questionSchema = mongoose.Schema(
       ref: "DiscussionUser",
       default: [],
     },
-    image: { type: String, default: null },
+    image: {
+      data: Buffer,
+      contentType: String,
+    },
   },
   {
     timestamps: true,
