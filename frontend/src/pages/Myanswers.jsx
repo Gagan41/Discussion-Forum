@@ -33,6 +33,19 @@ const Myanswers = () => {
     }
   );
 
+  // Handle reply deletion
+  const handleDeleteReply = async (questionId, replyId) => {
+    try {
+      await newRequests.delete(
+        `${process.env.REACT_APP_BACKEND_URL}/replies/${replyId}`
+      );
+      // Invalidate the query to refetch data after deletion
+      queryClient.invalidateQueries("getMyQuestions");
+    } catch (error) {
+      console.error("Failed to delete reply:", error);
+    }
+  };
+
   // Handle loading state
   if (isLoading)
     return (
@@ -124,6 +137,15 @@ const Myanswers = () => {
                     <div className="bg-white max-w-xl p-5 rounded-lg shadow-md flex flex-col items-start gap-5 mt-2">
                       <p>{answer?.reply}</p>
                       <UserInfo answer={answer} />
+                      {/* Delete Reply Button */}
+                      <button
+                        onClick={() =>
+                          handleDeleteReply(question._id, answer._id)
+                        }
+                        className="text-sm flex bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600"
+                      >
+                        Delete Reply
+                      </button>
                     </div>
                   </div>
                 ))}
