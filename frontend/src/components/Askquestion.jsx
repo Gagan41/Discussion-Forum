@@ -3,6 +3,7 @@ import { BsCamera } from "react-icons/bs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { duration } from "moment";
 
 const AskQuestion = () => {
   const user = JSON.parse(localStorage.getItem("user")); 
@@ -23,21 +24,41 @@ const AskQuestion = () => {
     e.preventDefault();
     const { title, description, tags } = e.target;
   
+    // Prepare the question data
+    const question = {
+      question: title.value,
+      description: description.value,
+      tags: tags.value
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== ""),
+      userId: user?._id,
+      userName: user?.name, // Include the user's name
+    };
+  
+    // Call Hugging Face API for spam detection
+    try {
+      const spamDetectionResponse = await callHuggingFaceModel(question.question);
+      if (spamDetectionResponse?.[0]?.label === "LABEL_1") {
+        toast.error("Your question is flagged as spam. Please modify and try again.");
+        return;
+      }
+    } catch (error) {
+      console.error("Error calling Hugging Face API:", error);
+      toast.error("Failed to verify question. Please try again.");
+      return;
+    }
+  
+    // Prepare form data for the request
     const formData = new FormData();
-    formData.append("question", title.value);
-    formData.append("description", description.value);
-    formData.append(
-      "tags",
-      JSON.stringify(
-        tags.value
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag !== "")
-      )
-    );
-    formData.append("userId", user?._id);
+    formData.append("question", question.question);
+    formData.append("description", question.description);
+    formData.append("tags", JSON.stringify(question.tags));
+    formData.append("userId", question.userId);
+    formData.append("userName", question.userName);
     if (image) formData.append("image", image);
   
+    // Send the request
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/ask-question`,
@@ -64,6 +85,61 @@ const AskQuestion = () => {
       );
     }
   };
+  
+  // Hugging Face API integration
+  async function callHuggingFaceModel(inputText) {
+    const modelUrl =
+      "https://api-inference.huggingface.co/models/shahrukhx01/bert-mini-finetune-question-detection";
+  
+    const fetchModelResponse = async () => {
+      try {
+        const response = await fetch(modelUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer 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`, // Replace with your actual Hugging Face API key
+          },
+          body: JSON.stringify({ inputs: inputText }),
+        });
+  
+        if (!response.ok) {
+          if (response.status === 503) {
+            throw new Error("Model is loading, retrying...");
+          } else {
+            throw new Error("Failed to call the model.");
+          }
+        }
+  
+        return await response.json();
+      } catch (error) {
+        console.error("Error calling Hugging Face model:", error);
+        throw error; // Throw error to trigger retry logic
+      }
+    };
+  
+    let attempts = 0;
+    const maxRetries = 5;
+    let success = false;
+    let result;
+  
+    while (attempts < maxRetries && !success) {
+      try {
+        result = await fetchModelResponse();
+        success = true; // If no error is thrown, the call was successful
+      } catch (error) {
+        attempts++;
+        if (attempts < maxRetries) {
+          console.log(`Retrying... (${attempts}/${maxRetries})`);
+          await new Promise((resolve) => setTimeout(resolve, 5000)); // wait 5 seconds before retrying
+        } else {
+          console.log("Failed after multiple retries");
+        }
+      }
+    }
+  
+    return result;
+  }
+  
 
   return (
     <div className="h-full md:w-[50%]">

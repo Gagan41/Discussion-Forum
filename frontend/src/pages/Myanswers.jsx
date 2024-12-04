@@ -41,8 +41,7 @@ const Myanswers = () => {
 
   return (
     <div
-      className="h-full w-full md:w-[60%] flex flex-col items-center 
-    gap-8 "
+      className="h-full w-full md:w-[60%] flex flex-col items-center"
     >
       {questions.length > 0 &&
         questions.map((question, index) => (
@@ -64,6 +63,18 @@ const Myanswers = () => {
               <div className="right-section w-full">
                 <h1 className="text-base md:text-lg">{question?.question}</h1>
                 <p className="text-sm md:text-base">{question?.description}</p>
+                
+                {/* Image Display Section */}
+                {question.image && (
+                  <div className="mt-4">
+                    <img
+                      src={`${process.env.REACT_APP_BACKEND_URL}/${question.image}`}
+                      alt="Question Attachment"
+                      className="w-full max-h-60 object-cover rounded-md"
+                    />
+                  </div>
+                )}
+                
                 <hr />
                 <UserInfo
                   openId={openId}
@@ -73,7 +84,7 @@ const Myanswers = () => {
                 />
               </div>
             </div>
-            {/* nested comment */}
+            {/* Nested Comment Section */}
             {openId.find((ele) => ele === index + 1) && (
               <>
                 {question?.replies?.map((answer, replyIndex) => (

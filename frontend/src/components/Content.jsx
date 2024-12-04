@@ -78,6 +78,7 @@ const Content = () => {
                     index={index + 1}
                     setOpenId={setOpenId}
                     question={question}
+                    userName={question.userName}
                   />
                 </div>
               </div>

@@ -4,13 +4,14 @@ import moment from "moment";
 
 const UserInfo = ({ openId, index, setOpenId, question, answer }) => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
+
   return (
-    <div className="w-full  flex items-cente justify-between">
+    <div className="w-full flex items-center justify-between">
       <div className="w-[48%] md:max-w-screen-md posted-by flex items-center gap-2 md:gap-3">
         <img
           src={
-            question?.author?.profileImage ||
-            answer?.author?.profileImage ||
+            question?.userId?.profileImage ||
+            answer?.author?.profileImage || // For replies, adjust as needed
             "https://avatars.githubusercontent.com/u/56132780?v=4"
           }
           alt="profile"
@@ -18,11 +19,11 @@ const UserInfo = ({ openId, index, setOpenId, question, answer }) => {
         />
         <h2 className="text-gray-300 text-xs">
           {answer ? "answered by\n" : "posted by "}{" "}
-          <span className="text-purple-800 font-bold  md:text-sm">
+          <span className="text-purple-800 font-bold md:text-sm">
             {question
-              ? question?.author?.name === currentUser?.name
-                ? question?.author?.name + " (You)"
-                : question?.author?.name
+              ? question?.userId?.name === currentUser?.name
+                ? question?.userId?.name + " (You)"
+                : question?.userId?.name
               : answer
               ? answer?.author?.name === currentUser?.name
                 ? answer?.author?.name + " (You)"
@@ -43,10 +44,10 @@ const UserInfo = ({ openId, index, setOpenId, question, answer }) => {
           className="comment flex gap-2 ml-auto cursor-pointer"
           onClick={() => {
             if (!openId.find((ele) => ele === index)) {
-              console.log("hello");
+              console.log("Opening comment section");
               setOpenId([...openId, index]);
-            }
-            if (openId.find((ele) => ele === index)) {
+            } else {
+              console.log("Closing comment section");
               setOpenId(openId.filter((ele) => ele !== index));
             }
           }}
