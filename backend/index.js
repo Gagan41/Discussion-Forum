@@ -253,6 +253,28 @@ app.delete('/questions/:id', async (req, res) => {
   }
 });
 
+app.delete("/replies/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find and delete the reply
+    const reply = await Reply.findByIdAndDelete(id);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    // Remove reply reference from the question it belongs to
+    await Question.updateOne(
+      { replies: id },
+      { $pull: { replies: id } }
+    );
+
+    res.status(200).json({ message: "Reply deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete reply" });
+  }
+});
 
 app.get("/find/:topic", async (req, res) => {
   const { topic } = req.params;
