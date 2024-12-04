@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import bcrypt from 'bcryptjs';
 import multer from "multer";
 import fs from "fs";
+import Message from "./model/message.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -230,24 +231,27 @@ app.get("/find/:topic", async (req, res) => {
   try {
     const questions = await Question.find({
       tags: {
-        $in: [topic],
+        $in: [new RegExp(topic, "i")], // Case-insensitive matching
       },
     })
       .populate("replies")
       .populate({
         path: "replies",
         populate: {
-          path: "userId",
+          path: "author",
           model: "DiscussionUser",
         },
       })
       .populate("userId")
       .sort({ createdAt: -1 });
+
     return res.status(200).json(questions);
   } catch (error) {
+    console.error("Error finding questions:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
+
 
 const server = app.listen(PORT, () => {
   connectDB();
@@ -265,6 +269,29 @@ const io = new Server(server, {
 
 let connectedUsers = new Map();
 let disconnectTimeouts = new Map();
+
+// Fetch messages for a specific room
+app.get("/messages/:room", async (req, res) => {
+  const { room } = req.params;
+  try {
+    const messages = await Message.find({ room }).sort({ createdAt: 1 });
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// Periodic deletion of old messages (older than 30 minutes)
+setInterval(async () => {
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // 30 minutes ago
+  try {
+    await Message.deleteMany({ createdAt: { $lt: thirtyMinutesAgo } });
+    console.log("Deleted messages older than 30 minutes");
+  } catch (error) {
+    console.error("Error deleting old messages:", error);
+  }
+}, 30 * 60 * 1000); // Run every 30 minutes
+
 
 io.on("connection", (socket) => {
   console.log("socket connected", socket.id);
@@ -293,9 +320,14 @@ io.on("connection", (socket) => {
     io.to(room).emit("user-connected", Array.from(connectedUsers.values()));
   });
 
-  // Send message in room
-  socket.on("send-message", ({ message, room, user }) => {
-    io.to(room).emit("receive-message", { message, user, room });
+  // Send message in room with MongoDB persistence
+  socket.on("send-message", async ({ message, room, user }) => {
+    try {
+      const newMessage = await Message.create({ room, message, user });
+      io.to(room).emit("receive-message", newMessage);
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
   });
 
   // Handle user logout explicitly
@@ -307,12 +339,12 @@ io.on("connection", (socket) => {
     socket.disconnect();
   });
 
-  // Handle disconnection with a timeout
+  // Handle disconnection with a timeout to allow reconnection
   socket.on("disconnect", () => {
-    console.log("socket disconnected", socket.id);
+    console.log("Socket disconnected:", socket.id);
 
     if (userId) {
-      // Set a timeout before fully removing the user
+      // Set a timeout before fully removing the user, allowing a brief reconnection window
       disconnectTimeouts.set(
         userId,
         setTimeout(() => {
@@ -323,6 +355,19 @@ io.on("connection", (socket) => {
       );
     }
   });
+
+  // Handle reconnection
+  socket.on("reconnect", () => {
+    console.log("Socket reconnected:", socket.id);
+    if (userId && connectedUsers.has(userId)) {
+      // Re-add the user to rooms if they had been removed
+      const userRooms = Array.from(socket.rooms).filter((room) => room !== socket.id);
+      userRooms.forEach((room) => socket.join(room));
+
+      io.emit("user-connected", Array.from(connectedUsers.values()));
+    }
+  });
 });
+
 
 export default app;
