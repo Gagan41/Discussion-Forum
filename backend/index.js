@@ -8,6 +8,9 @@ import { Server } from "socket.io";
 import bcrypt from 'bcryptjs';
 import multer from "multer";
 import Message from "./model/message.js";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -136,6 +139,62 @@ app.post("/answer/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }
+});
+
+let otpStore = {};
+
+// Send OTP
+app.post("/send-otp", (req, res) => {
+  const { email } = req.body;
+
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  otpStore[email] = otp;
+
+  // Configure nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL, // Email address from .env
+      pass: process.env.EMAIL_PASSWORD, // App password from .env
+    },
+  });
+
+  // Email content
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Your OTP for Registration",
+    text: `Your OTP is ${otp}. It is valid for 10 minutes.`,
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (error) => {
+    if (error) {
+      console.error("Error sending email:", error);
+      return res.status(500).send("Failed to send OTP");
+    }
+    console.log("OTP email sent to", email);
+    res.status(200).send("OTP sent successfully");
+  });
+});
+
+// Verify OTP
+app.post("/verify-otp", (req, res) => {
+  const { email, otp } = req.body;
+
+  // Check if OTP matches
+  if (otpStore[email] && otpStore[email] == otp) {
+    delete otpStore[email]; // OTP is valid, remove from store
+    return res.status(200).send("OTP verified");
+  }
+
+  res.status(400).send("Invalid OTP");
+});
+
+// Start the server
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });
 
 // general routes
