@@ -65,20 +65,6 @@ const Navbar = () => {
         H-Forum
       </div>
 
-      {/* Search Bar */}
-      <div
-        className="searchbar hidden border-none outline-none rounded-md py-1 h-8 px-4 w-96 
-        bg-gray-100 md:flex items-center"
-      >
-        <Search />
-        <input
-          onChange={handleChange}
-          type="text"
-          className="border-none outline-none rounded-md py-1 px-2 w-96 bg-gray-100"
-          placeholder="Search for Topics"
-        />
-      </div>
-
       <div className="flex items-center gap-3">
         {dark ? <Light /> : <Dark />}
         

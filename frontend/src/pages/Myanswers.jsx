@@ -75,7 +75,7 @@ const Myanswers = () => {
   };
 
   return (
-    <div className="h-full w-full md:w-[60%] flex flex-col items-center">
+    <div className="h-full w-full md:w-[60%] flex  bg-purple-100dark:text-black flex-col items-center">
       {questions.length > 0 &&
         questions.map((question, index) => (
           <div
@@ -83,17 +83,17 @@ const Myanswers = () => {
             className="w-full my-8 md:w-[80%] md:mx-12 flex flex-col items-end border 
               p-2 md:p-4 rounded-md bg-purple-100"
           >
-            <div className="w-full bg-white p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5">
+            <div className="w-full bg-purple-100 dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex text-black dark:text-white items-start gap-5">
               <div className="left-section space-y-1 text-center">
                 <Arrowup id={question._id} />
-                <h3 className="text-sm md:text-base">
+                <h3 className="text-sm md:text-base ">
                   {question?.upvote?.length || 0}
                 </h3>
                 <Arrowdown id={question._id} />
               </div>
               <div className="right-section w-full">
-                <h1 className="text-base md:text-lg">{question?.question}</h1>
-                <p className="text-sm md:text-base">{question?.description}</p>
+                <h1 className="text-base md:text-lg text-black dark:text-white">{question?.question}</h1>
+                <p className="text-sm md:text-base text-black dark:text-white">{question?.description}</p>
 
                 {/* Image Display Section */}
                 {question.image ? (

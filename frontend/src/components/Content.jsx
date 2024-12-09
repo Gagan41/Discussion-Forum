@@ -42,11 +42,11 @@ const Content = () => {
             <div
               key={index}
               className="w-[96%] md:w-[80%] mx-12 flex flex-col 
-              items-end  p-3 md:p-4 rounded-md bg-purple-100
+              items-end  p-3 md:p-4 rounded-md bg-gray-300
                dark:bg-slate-400"
             >
               <div
-                className="w-full bg-white dark:bg-[#1E212A]
+                className="w-full bg-purple-100 dark:bg-[#1E212A]
                p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5"
               >
                 <div className="left-section space-y-1 text-center">
@@ -60,7 +60,7 @@ const Content = () => {
                   <h1 className="text-base md:text-lg dark:text-white">
                     {question?.question}
                   </h1>
-                  <p className="text-sm md:text-base">
+                  <p className="text-sm text-black dark:text-white md:text-base">
                     {question?.description}
                   </p>
                   {question.image && (

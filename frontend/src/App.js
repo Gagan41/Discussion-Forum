@@ -12,6 +12,7 @@ import axios from "axios";
 import React from "react";
 import Chat from "./pages/Chat";
 import Myanswers from "./pages/Myanswers";
+import VerifyOtp from "./pages/VerifyOtp";
 import Explore from "./pages/Explore";
 import Notfound from "./components/Notfound";
 import { useDispatch, useSelector } from "react-redux";
@@ -125,6 +126,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/verify-otp",
+    element: <VerifyOtp />, 
   },
   {
     path: "/login",
