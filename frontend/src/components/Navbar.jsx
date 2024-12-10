@@ -8,6 +8,7 @@ import Cancel from "../icons/Cancel";
 import Logout from "../icons/Logout";
 import Dark from "../icons/Dark";
 import Light from "../icons/Light";
+import logo from "../images/logoname.png";
 
 const discussionTopics = [
   "Technology",
@@ -61,7 +62,9 @@ const Navbar = () => {
         >
           {!open ? <Hamburger /> : <Cancel />}
         </div>
-        H-Forum
+        <div className="md:flex-[0.5] flex-initial justify-center items-center">
+        <img src={logo} alt="logo" className="w-32 cursor-pointer" />
+      </div>
       </div>
 
       <div className="flex items-center gap-3">

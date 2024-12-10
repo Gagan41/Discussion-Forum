@@ -3,6 +3,7 @@ import React from "react";
 import upload from "../utils/upload";
 import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import logo from "../images/logo.png";
 
 const Register = () => {
   const [profileImage] = React.useState(
@@ -12,8 +13,7 @@ const Register = () => {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [password_confirmation, setPassword_confirmation] =
-    React.useState("");
+  const [password_confirmation, setPassword_confirmation] = React.useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +51,8 @@ const Register = () => {
     }
   };
 
- {/* const handleFile1 = async (e) => {
+  {
+    /* const handleFile1 = async (e) => {
     e.preventDefault();
 
     const files = e.target?.files;
@@ -65,7 +66,8 @@ const Register = () => {
       //setProfileImage(url);
       //toast.success("File Uploaded");
     }
-  };*/}
+  };*/
+  }
 
   return (
     <div className="">
@@ -73,7 +75,9 @@ const Register = () => {
       <div className="dark:bg-[#32353F] flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0">
         <div>
           <a href="/">
-            <h3 className="text-4xl font-bold dark:text-white">H-Forum</h3>
+            <div className="md:flex-[0.5] flex-initial justify-center items-center">
+              <img src={logo} alt="logo" className="w-32 cursor-pointer" />
+            </div>
           </a>
         </div>
         <div
