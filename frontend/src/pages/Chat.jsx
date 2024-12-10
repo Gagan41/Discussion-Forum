@@ -7,8 +7,94 @@ import { useSelector, useDispatch } from "react-redux";
 import { setOnlineUsers, addUsers, removeUsers } from "../context/onlineSlice"; // Import actions
 
 const discussionTopics = [
-  "technology", "Climate", "Space", "Artificial intelligence", "Social media",
-  "health", "education", "globalization", "culture", "Political", "Sports", "Public opinion",
+  "Technology",
+  "Climate",
+  "Space exploration",
+  "AI and ethics",
+  "Social media",
+  "Mental health",
+  "Education",
+  "Health",
+  "Culture",
+  "Politics",
+  "Sports",
+  "Public opinion",
+  "History",
+  "Economy",
+  "Business",
+  "Science",
+  "Philosophy",
+  "Art",
+  "Sustainability",
+  "Renewable energy",
+  "Cryptocurrency",
+  "Quantum computing",
+  "Globalization",
+  "Cybersecurity",
+  "Genetics",
+  "Neuroscience",
+  "Human rights",
+  "Entrepreneurship",
+  "Innovation",
+  "Space tourism",
+  "Pandemics",
+  "Bioethics",
+  "Food security",
+  "Agriculture",
+  "Urban development",
+  "Environmental policy",
+  "Artificial life",
+  "Literature",
+  "Music",
+  "Fashion",
+  "Photography",
+  "Robotics",
+  "Virtual reality",
+  "Augmented reality",
+  "Gaming",
+  "Animal welfare",
+  "Astronomy",
+  "Oceanography",
+  "Feminism",
+  "LGBTQ+ issues",
+  "Cultural heritage",
+  "Cognitive science",
+  "Evolution",
+  "Astrobiology",
+  "Machine learning",
+  "Blockchain",
+  "E-commerce",
+  "Digital marketing",
+  "Social justice",
+  "Environment",
+  "Workplace culture",
+  "Automation",
+  "Transportation",
+  "Public health",
+  "Nutrition",
+  "Wellness",
+  "Aging",
+  "Artificial general intelligence",
+  "Digital privacy",
+  "Online education",
+  "Parenting",
+  "Global warming",
+  "Nuclear energy",
+  "Deep learning",
+  "Climate adaptation",
+  "Data science",
+  "Conflict resolution",
+  "Economic inequality",
+  "Disaster management",
+  "Renewable materials",
+  "Tech regulation",
+  "Space habitats",
+  "Climate justice",
+  "Indigenous rights",
+  "Ethical hacking",
+  "Open source software",
+  "Consumer behavior",
+  "Sociology",
 ];
 
 const Chat = () => {
@@ -16,7 +102,9 @@ const Chat = () => {
   const [messages, setMessages] = useState({});
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [user] = useState(storedUser);
-  const [room, setRoom] = useState(localStorage.getItem("room") || "technology");
+  const [room, setRoom] = useState(
+    localStorage.getItem("room") || "technology"
+  );
 
   const onlineUsers = useSelector((state) => state.online.onlineUsers);
   const dispatch = useDispatch();
@@ -24,7 +112,10 @@ const Chat = () => {
   // Fetch messages for the selected room
   const fetchMessages = async (room) => {
     try {
-      const response = await axios.get(`http://localhost:5132/messages/${room}`);
+      const [responseFromLocal, responseFromDiscuza] = await Promise.all([
+        axios.get(`http://localhost:5132/messages/${room}`),
+        axios.get(`https://api1.discuza.in/messages/${room}`),
+      ]);
       setMessages((prev) => ({
         ...prev,
         [room]: response.data,
@@ -57,7 +148,7 @@ const Chat = () => {
       }
       console.log("User joined:", newUser);
     });
-    
+
     socket.on("user-left", (userId) => {
       console.log("User left:", userId);
       dispatch(removeUsers({ _id: userId }));
@@ -68,7 +159,11 @@ const Chat = () => {
         ...prev,
         [newMessage.room]: [
           ...(prev[newMessage.room] || []),
-          { message: newMessage.message, user: newMessage.user, createdAt: newMessage.createdAt },
+          {
+            message: newMessage.message,
+            user: newMessage.user,
+            createdAt: newMessage.createdAt,
+          },
         ],
       }));
     });
@@ -128,8 +223,17 @@ const Chat = () => {
       {/* Chat Box */}
       <div className="w-full relative border-2 overflow-y-scroll p-3 px-2 md:p-4 rounded-md md:w-[80%] h-[90%] md:h-[80%] flex flex-col">
         {messages[room]?.map((msg, index) => (
-          <div key={index} className={`w-max mb-2 ${user?._id === msg.user._id ? "ml-auto" : ""}`}>
-            <div className={`text-sm md:text-base text-white py-2 px-3 rounded-md ${user?._id === msg.user._id ? "bg-purple-600" : "bg-purple-400"}`}>
+          <div
+            key={index}
+            className={`w-max mb-2 ${
+              user?._id === msg.user._id ? "ml-auto" : ""
+            }`}
+          >
+            <div
+              className={`text-sm md:text-base text-white py-2 px-3 rounded-md ${
+                user?._id === msg.user._id ? "bg-purple-600" : "bg-purple-400"
+              }`}
+            >
               {msg.message}
             </div>
             <span className="text-xs text-gray-500">
@@ -158,18 +262,24 @@ const Chat = () => {
             stroke="currentColor"
             className="w-5 h-5 text-white cursor-pointer hover:scale-110 hover:translate-x-1 hover:transform transition-all duration-300"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+            />
           </svg>
         </div>
       </div>
 
       {/* Room Selection */}
       <div className="w-full flex justify-center my-4 overflow-x-auto">
-        <div className="flex gap-1">
+        <div className="flex gap-1 min-w-full">
           {discussionTopics.map((topic) => (
             <button
               key={topic}
-              className={`px-2 py-1 text-sm rounded-md ${room === topic ? "bg-purple-600 text-white" : "bg-gray-300"}`}
+              className={`px-2 py-1 text-sm rounded-md ${
+                room === topic ? "bg-purple-600 text-white" : "bg-gray-300"
+              }`}
               onClick={() => handleRoomChange(topic)}
             >
               {topic}
