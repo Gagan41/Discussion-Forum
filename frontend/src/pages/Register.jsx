@@ -5,8 +5,8 @@ import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const [profileImage, setProfileImage] = React.useState(
-    "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg"
+  const [profileImage] = React.useState(
+    "https://img.freepik.com/premium-vector/business-global-economy_24877-41082.jpg"
   );
   const navigate = useNavigate();
   const [name, setName] = React.useState("");
@@ -51,7 +51,7 @@ const Register = () => {
     }
   };
 
-  const handleFile1 = async (e) => {
+ {/* const handleFile1 = async (e) => {
     e.preventDefault();
 
     const files = e.target?.files;
@@ -60,12 +60,12 @@ const Register = () => {
       for (const file of files) {
         data.append("file", file);
       }
-      data.append("upload_preset", "fiverr");
-      const url = await upload(data);
-      setProfileImage(url);
-      toast.success("File Uploaded");
+      //data.append("upload_preset", "fiverr");
+      //const url = await upload(data);
+      //setProfileImage(url);
+      //toast.success("File Uploaded");
     }
-  };
+  };*/}
 
   return (
     <div className="">
@@ -87,9 +87,8 @@ const Register = () => {
             >
               <img className="rounded-full" src={profileImage} alt="" />
               <input
-                onChange={handleFile1}
                 id="dropzone-file"
-                type="file"
+                //type="file"
                 className="hidden"
               />
             </label>

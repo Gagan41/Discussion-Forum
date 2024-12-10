@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileView from "./ProfileView.js"; // Import ProfileView component
 import { toggle } from "../context/sidebarSlice";
-import Search from "../icons/Search";
 import Hamburger from "../icons/Hamburger";
 import Cancel from "../icons/Cancel";
 import Logout from "../icons/Logout";
@@ -67,14 +66,12 @@ const Navbar = () => {
 
       <div className="flex items-center gap-3">
         {dark ? <Light /> : <Dark />}
-        
-        {/* Logout Button */}
-        <Logout />
-        
-        <div className="hidden md:flex items-center gap-5">
+
+        <div className="flex items-center gap-5">
+          {/* Logout Button for Laptop Screens */}
           <div
-            className="flex items-center justify-center gap-2 px-4 py-2 cursor-pointer 
-            bg-purple-600 mx-4 rounded-md text-white"
+            className="hidden md:flex items-center justify-center gap-2 px-4 py-2 cursor-pointer 
+    bg-purple-600 mx-4 rounded-md text-white"
             onClick={() => {
               localStorage.removeItem("user");
               navigate("/login");
@@ -82,6 +79,8 @@ const Navbar = () => {
           >
             Logout
           </div>
+
+          <Logout />
           
           {/* Profile Picture with Clickable Dropdown */}
           <div className="relative">
@@ -94,24 +93,21 @@ const Navbar = () => {
               alt="profile"
               className="w-6 h-6 md:w-7 md:h-7 rounded-full cursor-pointer"
             />
-            
+
             {/* Profile View Dropdown */}
             {isProfileOpen && (
-            <div
-               className="fixed inset-0 flex items-center justify-center bg-opacity-40 bg-black z-20"
-               onClick={() => setIsProfileOpen(false)} // Close when clicking outside
-            >
-            <div
-              className="relative bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg rounded-md p-6 text-white"
-              style={{ width: "300px" }}
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-           >
-         <ProfileView user={user} />
-        </div>
-        </div>
-        )}
-
-
+              <div
+                className="fixed inset-0 flex items-center justify-center bg-opacity-40 bg-black z-20"
+                onClick={() => setIsProfileOpen(false)} // Close when clicking outside
+              >
+                <div
+                  className="relative bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg rounded-md p-6 text-white w-full max-w-sm mx-auto"
+                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+                >
+                  <ProfileView user={user} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

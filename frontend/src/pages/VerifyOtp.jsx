@@ -43,6 +43,10 @@ const VerifyOtp = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">Verify OTP</h1>
+      <p className="text-sm md:text-base text-black dark:text-white text-center">
+        Please check the Email that you have provided <br />
+        (If not found, check Spam Folder also.)
+      </p>
       <div className="w-80 p-4 bg-white rounded shadow-md">
         <form onSubmit={handleVerifyOtp}>
           <label
