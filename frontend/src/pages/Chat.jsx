@@ -112,13 +112,12 @@ const Chat = () => {
   // Fetch messages for the selected room
   const fetchMessages = async (room) => {
     try {
-      const [responseFromLocal, responseFromDiscuza] = await Promise.all([
-        axios.get(`http://localhost:5132/messages/${room}`),
+      const [responseFromDiscuza] = await Promise.all([
         axios.get(`https://api1.discuza.in/messages/${room}`),
       ]);
       setMessages((prev) => ({
         ...prev,
-        [room]: responseFromLocal.data,
+        [room]: responseFromDiscuza.data,
       }));
     } catch (error) {
       console.error("Error fetching messages:", error);
