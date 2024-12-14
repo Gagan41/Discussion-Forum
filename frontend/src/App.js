@@ -53,7 +53,7 @@ const Layout = () => {
     socket.auth = user;
 
     socket.on("user-connected", (users) => {
-      console.log("users", users);
+     // console.log("users", users);
 
       dispatch(addUsers(users));
     });
@@ -62,7 +62,7 @@ const Layout = () => {
       console.log("users", users);
       dispatch(addUsers(users));
     });
-    console.log("backend url", process.env.REACT_APP_BACKEND_URL);
+    //console.log("backend url", process.env.REACT_APP_BACKEND_URL);
     const getUsers = async () => {
       const res = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/allusers`
@@ -102,7 +102,7 @@ const Layout = () => {
               <h2 className="text-gray-600 font-bold text-start">Top Users</h2>
               {users.length > 0 &&
                 users.slice(0, 5).map((user, index) => {
-                  console.log("user", user);
+                 // console.log("user", user);
                   return (
                     <div className="flex items-center cursor-pointer">
                       <img

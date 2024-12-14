@@ -14,7 +14,7 @@ const ProfileView = ({ user }) => {
           className="w-16 h-16 rounded-full mb-2"
         />
         <h2 className="text-lg font-bold">{user.name || "User Name"}</h2>
-        <p className="text-black">{user.email || "user@example.com"}</p>
+        <p className="text-white text-base font-bold">{user.email || "user@example.com"}</p>
       </div>
 
       

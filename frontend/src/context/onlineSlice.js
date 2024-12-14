@@ -13,10 +13,10 @@ export const socketSlice = createSlice({
     },
     addUsers(state, action) {
       state.onlineUsers = action.payload;
-      console.log("state", state.onlineUsers);
+      //console.log("state", state.onlineUsers);
     },
     removeUsers(state, action) {
-      console.log("remove", action.payload);
+     // console.log("remove", action.payload);
       state.onlineUsers = state.onlineUsers.filter(
         (user) => user._id !== action.payload
       );
