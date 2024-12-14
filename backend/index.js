@@ -370,7 +370,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
   secure: true,
   cors: {
-    origin: ["http://localhost:3000", "https://discuza.in"],
+    origin: "https://discuza.in",
     methods: ["GET", "POST"],
     credentials: true,
   },
