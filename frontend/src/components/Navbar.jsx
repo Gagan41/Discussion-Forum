@@ -104,7 +104,7 @@ const Navbar = () => {
                 onClick={() => setIsProfileOpen(false)} // Close when clicking outside
               >
                 <div
-                  className="relative bg-gradient-to-br from-purple-950 rounded-md p-6 text-white w-full max-w-sm mx-auto"
+                  className="relative bg-purple-950 rounded-md p-6 text-white w-full max-w-sm mx-auto"
                   onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                 >
                   <ProfileView user={user} />

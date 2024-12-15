@@ -40,7 +40,7 @@ const Layout = () => {
       console.log("users", users);
       dispatch(addUsers(users));
     };
-  
+
     const handleUserDisconnected = (users) => {
       console.log("users", users);
       dispatch(addUsers(users));
@@ -53,7 +53,7 @@ const Layout = () => {
     socket.auth = user;
 
     socket.on("user-connected", (users) => {
-     // console.log("users", users);
+      // console.log("users", users);
 
       dispatch(addUsers(users));
     });
@@ -74,7 +74,7 @@ const Layout = () => {
       socket.off("user-connected", handleUserConnected);
       socket.off("user-disconnected", handleUserDisconnected);
     };
-  }, [dispatch]); 
+  }, [dispatch]);
 
   return (
     <QueryClientProvider client={queryClient} contextSharing={true}>
@@ -98,11 +98,12 @@ const Layout = () => {
             <div
               className="mt-8  py-4 px-3 rounded-md flex
          flex-col items-start gap-5"
+              style={{ maxHeight: "400px", overflowY: " auto" }}
             >
               <h2 className="text-gray-600 font-bold text-start">Top Users</h2>
               {users.length > 0 &&
-                users.slice(0, 5).map((user, index) => {
-                 // console.log("user", user);
+                users.slice(0, users.length).map((user, index) => {
+                  // console.log("user", user);
                   return (
                     <div className="flex items-center cursor-pointer">
                       <img
@@ -129,7 +130,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/verify-otp",
-    element: <VerifyOtp />, 
+    element: <VerifyOtp />,
   },
   {
     path: "/login",
