@@ -43,7 +43,7 @@ const Register = () => {
         toast.success("OTP sent to your email");
         navigate("/verify-otp", { state: { email, user } });
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error("User alreday exists");
       }
     } catch (err) {
       console.error("Error:", err);

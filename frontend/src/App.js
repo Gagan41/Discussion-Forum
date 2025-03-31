@@ -18,6 +18,7 @@ import Notfound from "./components/Notfound";
 import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import { addUsers } from "./context/onlineSlice";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -135,6 +136,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/forgot-password", // Forgot Password route
+    element: <ForgotPassword />,
   },
   {
     path: "/",

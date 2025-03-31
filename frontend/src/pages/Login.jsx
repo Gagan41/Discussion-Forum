@@ -83,7 +83,7 @@ These Terms and Conditions are governed by the laws of India. Any disputes shall
 ---
 `;
 
-const privacyContent = `
+  const privacyContent = `
 Privacy Policy
 
 1. Introduction
@@ -117,7 +117,7 @@ For questions regarding this policy, email us at discuzaforum@gmail.com.
 ---
 `;
 
-const disclaimerContent = `
+  const disclaimerContent = `
 Disclaimer
 
 - Accuracy of Information: discuza.in does not guarantee the accuracy or completeness of any content posted by users. The Website is not responsible for any decisions made based on this content, especially in sensitive areas such as health, politics, or science.
@@ -208,8 +208,14 @@ By using discuza.in, you acknowledge that you have read, understood, and agree t
               >
                 Login
               </button>
-              <a className="text-sm text-grap-500 underline" href="/register">
+              <a className="text-sm text-black-500 underline" href="/register">
                 Don't have an account? Register
+              </a>
+              <a
+                className="text-sm text-black-500 underline mt-2"
+                href="/forgot-password"
+              >
+                Forgot Password?
               </a>
             </div>
           </form>
@@ -260,7 +266,9 @@ By using discuza.in, you acknowledge that you have read, understood, and agree t
             className="bg-white text-black p-4 rounded shadow-lg w-full h-full max-w-full max-h-full overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="whitespace-pre-wrap text-black text-base font-bold">{modalContent}</p>
+            <p className="whitespace-pre-wrap text-black text-base font-bold">
+              {modalContent}
+            </p>
             <button
               onClick={closeModal}
               className="mt-4 text-orange-500 hover:underline"
