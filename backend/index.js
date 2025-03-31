@@ -119,6 +119,7 @@ app.post("/verify-reset-otp", (req, res) => {
 
 app.post("/reset-password", async (req, res) => {
   const { email, newPassword } = req.body;
+
   try {
     // Find the user by email
     const user = await User.findOne({ email });
@@ -126,12 +127,10 @@ app.post("/reset-password", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the user's password
-    user.password = hashedPassword;
+    // Set the new password (Mongoose middleware will handle hashing)
+    user.password = newPassword;
+    
+    // Save the updated user document
     await user.save();
 
     res.status(200).json({ message: "Password reset successfully" });
@@ -140,7 +139,6 @@ app.post("/reset-password", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
 
 // Multer setup for memory storage
 const storage = multer.memoryStorage();
