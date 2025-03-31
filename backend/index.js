@@ -71,6 +71,77 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post("/send-reset-otp", (req, res) => {
+  const { email } = req.body;
+
+  // Generate a 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  // Use a separate key for reset OTPs so they don't conflict with registration OTPs
+  otpStore[`reset_${email}`] = otp;
+
+  // Configure nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL, // Email from .env
+      pass: process.env.EMAIL_PASSWORD, // App password from .env
+    },
+  });
+
+  // Email content
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Your OTP for Password Reset",
+    text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`,
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (error) => {
+    if (error) {
+      console.error("Error sending reset OTP email:", error);
+      return res.status(500).send("Failed to send OTP");
+    }
+    console.log("Password reset OTP email sent to", email);
+    res.status(200).send("OTP sent successfully");
+  });
+});
+
+app.post("/verify-reset-otp", (req, res) => {
+  const { email, otp } = req.body;
+  // Check the OTP using the key for password reset
+  if (otpStore[`reset_${email}`] && otpStore[`reset_${email}`] == otp) {
+    delete otpStore[`reset_${email}`]; // OTP is valid, remove it from the store
+    return res.status(200).send("OTP verified");
+  }
+  res.status(400).send("Invalid OTP");
+});
+
+app.post("/reset-password", async (req, res) => {
+  const { email, newPassword } = req.body;
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
 // Multer setup for memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
