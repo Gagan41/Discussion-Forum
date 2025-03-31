@@ -29,16 +29,19 @@ const Login = () => {
         `${process.env.REACT_APP_BACKEND_URL}/login`,
         user
       );
+    
       if (res.status === 200) {
         localStorage.setItem("user", JSON.stringify(res.data));
         navigate("/");
         toast.success("Logged in successfully");
-      } else {
-        toast.error("User does not exist or password maybe incorrect");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong, please try again!");
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong, please try again!");
+      }
     }
   };
 

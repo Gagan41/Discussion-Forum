@@ -38,17 +38,21 @@ const Register = () => {
       );
       console.log("Response status:", res.status);
       console.log("Response data:", res.data);
-
+    
       if (res.status === 200) {
         toast.success("OTP sent to your email");
         navigate("/verify-otp", { state: { email, user } });
-      } else {
-        toast.error("User alreday exists");
       }
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Something went wrong. Please try again.");
+      // Check if error response has a message from the server
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
+    
   };
 
   {
