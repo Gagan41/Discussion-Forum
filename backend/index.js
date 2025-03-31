@@ -126,13 +126,12 @@ app.post("/reset-password", async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-
-    // Set the new password (Mongoose middleware will handle hashing)
+    // Directly set the new password
     user.password = newPassword;
-    
-    // Save the updated user document
+    // Explicitly mark password as modified to trigger hashing middleware
+    user.markModified("password");
+    // Save the updated user document (middleware will hash it)
     await user.save();
-
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error("Error resetting password:", error);
