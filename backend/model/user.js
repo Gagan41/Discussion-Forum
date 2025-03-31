@@ -30,34 +30,40 @@ const userSchema = mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
-  // Check if the password field has been modified
-  if (!this.isModified("password")) {
-    return next();
+  if (!this.isModified("password")) return next();
+  const rounds = await bcrypt.getRounds(this.password);
+  if (rounds) {
+    //console.log("Password is already hashed, skipping re-hashing");
+    return next(); // Skip hashing if it's already hashed
   }
 
   try {
-    // Generate salt and hash the password
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     console.log("Password successfully hashed");
     next();
   } catch (error) {
     console.error("Error hashing password:", error);
-    next(error); // Pass the error to the next middleware
+    next(error);
   }
 });
+
 
 // Method to compare entered password with the hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   try {
+    console.log("Entered Password:", enteredPassword);
+    console.log("Stored Hashed Password:", this.password);
+
     const isMatch = await bcrypt.compare(enteredPassword, this.password);
-    console.log(`Password match: ${isMatch}`);
+    console.log(`Password match result: ${isMatch}`); // Debugging log
     return isMatch;
   } catch (error) {
     console.error("Error comparing passwords:", error);
     throw new Error("Password comparison failed");
   }
 };
+
 
 const User = mongoose.model("DiscussionUser", userSchema);
 export default User;

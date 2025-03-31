@@ -121,17 +121,19 @@ app.post("/reset-password", async (req, res) => {
   const { email, newPassword } = req.body;
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    // Directly set the new password
-    user.password = newPassword;
-    // Explicitly mark password as modified to trigger hashing middleware
-    user.markModified("password");
-    // Save the updated user document (middleware will hash it)
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    //console.log("New hashed password:", hashedPassword); // Debugging log
+    user.password = hashedPassword;
+    // Save the updated user document
     await user.save();
+
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error("Error resetting password:", error);
