@@ -30,11 +30,10 @@ app.get("/", (req, res) => {
 // create a new user
 app.post("/signup", async (req, res) => {
   const { name, password, email, profileImage } = req.body;
-  console.log("req.body", req.body);
   try {
-    const findUser = await User.findOne({ name });
+    const findUser = await User.findOne({ email });
     if (findUser) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res.status(400).json({ message: "Username already exists with same Email" });
     }
     const newUser = await User.create({ name, password, email, profileImage });
     return res.status(201).json({ message: "User created successfully" });
@@ -214,9 +213,13 @@ app.post("/answer/:id", async (req, res) => {
 let otpStore = {};
 
 // Send OTP
-app.post("/send-otp", (req, res) => {
+app.post("/send-otp", async (req, res) => {
   const { email } = req.body;
-
+  
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists with same Email" });
+  }
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000);
   otpStore[email] = otp;
