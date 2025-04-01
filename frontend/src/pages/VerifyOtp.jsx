@@ -26,7 +26,7 @@ const VerifyOtp = () => {
         { email, otp }
       );
       if (res.status === 200) {
-        toast.success("OTP verified successfully", { duration: 1000 });
+        toast.success("OTP verified successfully", { duration: 2000 });
         // Proceed with user registration
         await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, user);
         toast.success("User registered successfully. Please log in.", { duration: 2000 });
