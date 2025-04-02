@@ -66,7 +66,7 @@ const VerifyOtp = () => {
           />
           <button
             type="submit"
-            className="w-full px-4 py-2 mt-4 text-white bg-blue-600 rounded"
+            className="w-full px-4 py-2 mt-4 text-white bg-purple-600 rounded"
           >
             Verify OTP
           </button>

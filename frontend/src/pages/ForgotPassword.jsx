@@ -96,7 +96,7 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded"
+              className="w-full bg-purple-600 text-white py-2 rounded"
             >
               Send OTP
             </button>
@@ -106,6 +106,10 @@ const ForgotPassword = () => {
         {step === 2 && (
           <form onSubmit={handleVerifyOtp}>
             <div className="mb-4">
+              <p className="text-sm md:text-base text-black dark:text-white text-center">
+                Please check the Email that you have provided <br />
+                (If not found, check Spam Folder also.)
+              </p>
               <label className="block text-gray-700">Enter OTP</label>
               <input
                 type="text"
@@ -117,7 +121,7 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded"
+              className="w-full bg-purple-600 text-white py-2 rounded"
             >
               Verify OTP
             </button>
@@ -148,7 +152,7 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded"
+              className="w-full bg-purple-600 text-white py-2 rounded"
             >
               Reset Password
             </button>
