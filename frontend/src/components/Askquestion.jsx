@@ -109,7 +109,7 @@ const AskQuestion = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer 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`, // Replace with your actual Hugging Face API key
+            Authorization: ``, // Replace with your actual Hugging Face API key
           },
           body: JSON.stringify({ inputs: inputText }),
         });
